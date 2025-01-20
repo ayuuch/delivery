@@ -1,0 +1,62 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // Le plugin Flutter doit être appliqué après les plugins Android et Kotlin.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+// Supprimer le dossier de build si la tâche clean existe
+tasks.matching { it.name == "clean" }.configureEach {
+    delete rootProject.buildDir
+}
+
+android {
+    namespace = "com.example.food_delivery"
+    compileSdk = 34 // Utilisez une version fixe pour `compileSdk`.
+    ndkVersion = "25.1.8937393" // Version NDK installée sur votre système.
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    defaultConfig {
+        applicationId = "com.example.food_delivery"
+        minSdk = 21 // Version minimale recommandée.
+        targetSdk = 34 // Version stable recommandée.
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    buildTypes {
+        release {
+            // Configurez une signature pour le build release.
+            signingConfig = signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
